@@ -1,16 +1,15 @@
-// vitest.setup.ts
-import { execSync } from "node:child_process";
-import { db } from "./app/db.server";
+import * as matchers from "@testing-library/jest-dom/matchers";
+import { cleanup } from "@testing-library/react";
+import { afterEach, beforeEach, expect } from "vitest";
+import { prisma } from "./app/db.server"; // Match the named export
 
-export default async function setup() {
-	// Initialize the test database schema
-	execSync("npx prisma db push --force-reset", {
-		env: { ...process.env, DATABASE_URL: "file:./test.db" },
-	});
-}
+expect.extend(matchers);
 
-// Global cleanup after each test to ensure no data leaks between service tests
-import { beforeEach } from "vitest";
 beforeEach(async () => {
-	await db.task.deleteMany();
+	// Clean the database before every test to ensure isolation
+	await prisma.task.deleteMany();
+});
+
+afterEach(() => {
+	cleanup();
 });

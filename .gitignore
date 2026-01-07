@@ -9,3 +9,5 @@
 /generated/prisma
 
 /generated/prisma
+prisma/dev.db
+prisma/test.db

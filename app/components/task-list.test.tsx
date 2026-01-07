@@ -1,7 +1,7 @@
-import { render, screen, fireEvent } from "@testing-library/react";
-import { describe, it, expect, vi } from "vitest";
-import { TaskList } from "./task-list";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { createMemoryRouter, RouterProvider } from "react-router";
+import { describe, expect, it, vi } from "vitest";
+import { TaskList } from "./task-list";
 
 const mockSubmit = vi.fn();
 
@@ -11,13 +11,17 @@ vi.mock("react-router", async () => {
 		...actual,
 		useFetchers: () => [], // Add empty fetchers array to support Optimistic UI filter
 		useFetcher: () => ({
-			Form: ({ children, ...props }: any) => (
+			Form: ({
+				children,
+				...props
+			}: React.FormHTMLAttributes<HTMLFormElement>) => (
 				<form
 					{...props}
-					onSubmit={(e: any) => {
+					onSubmit={(e: React.FormEvent<HTMLFormElement>) => {
 						e.preventDefault();
 						const formData = new FormData(e.currentTarget);
-						const submitter = e.nativeEvent.submitter;
+						const submitter = (e.nativeEvent as SubmitEvent)
+							.submitter as HTMLButtonElement;
 						if (submitter?.name)
 							formData.append(submitter.name, submitter.value);
 						mockSubmit(formData);
@@ -46,13 +50,15 @@ describe("TaskList Component", () => {
 	});
 
 	it("renders the list of tasks provided in props", () => {
-		const tasks = [{ id: "1", title: "Task 1" }];
+		const tasks = [{ id: "1", title: "Task 1", createdAt: new Date() }];
 		renderWithRouter(<TaskList tasks={tasks} />);
 		expect(screen.getByText("Task 1")).toBeDefined();
 	});
 
 	it("submits the fetcher when the delete button is clicked", () => {
-		const tasks = [{ id: "123", title: "Task to delete" }];
+		const tasks = [
+			{ id: "123", title: "Task to delete", createdAt: new Date() },
+		];
 		renderWithRouter(<TaskList tasks={tasks} />);
 
 		const deleteButton = screen.getByLabelText("delete");

@@ -1,22 +1,21 @@
+import { Box, CircularProgress, Typography } from "@mui/material";
+import { Suspense } from "react";
 import {
-	data,
 	type ActionFunctionArgs,
-	type LoaderFunctionArgs,
 	Await,
+	data,
+	type LoaderFunctionArgs,
 	useLoaderData,
 } from "react-router";
-import { Suspense } from "react";
-import { TaskService } from "../services/task.server";
-import { TaskList } from "../components/task-list";
-import { TaskInputForm } from "../components/task-input-form";
-import { TaskListSkeleton } from "../components/task-list-skeleton";
 import { RouteErrorBoundary } from "../components/route-error-boundary";
-import { Box, Typography, CircularProgress } from "@mui/material";
+import { TaskInputForm } from "../components/task-input-form";
+import { TaskList } from "../components/task-list";
+import { TaskListSkeleton } from "../components/task-list-skeleton";
+import { TaskSchema } from "../models/task";
+import { TaskService } from "../services/task.server";
 
 export const ErrorBoundary = RouteErrorBoundary;
 
-// This handles the "No HydrateFallback" warning.
-// It renders during the very initial load before the JS has fully taken over.
 export function HydrateFallback() {
 	return (
 		<Box sx={{ display: "flex", justifyContent: "center", mt: 8 }}>
@@ -25,26 +24,32 @@ export function HydrateFallback() {
 	);
 }
 
-export async function loader({ request }: LoaderFunctionArgs) {
+export async function loader(_args: LoaderFunctionArgs) {
 	const tasksPromise = TaskService.getAllTasks();
 	return data({ tasks: tasksPromise });
 }
 
 export async function action({ request }: ActionFunctionArgs) {
 	const formData = await request.formData();
-	const intent = formData.get("intent");
+	const submission = TaskSchema.safeParse(Object.fromEntries(formData));
 
-	if (intent === "create") {
-		const title = formData.get("title") as string;
-		return await TaskService.createTask({ title });
+	if (!submission.success) {
+		// In production, you'd log this to an error tracking service
+		return data({ errors: submission.error.flatten() }, { status: 400 });
 	}
 
-	if (intent === "delete") {
-		const id = formData.get("id") as string;
-		return await TaskService.deleteTask(id);
+	const validData = submission.data;
+
+	// Branching logic based on validated intent
+	if (validData.intent === "create") {
+		return await TaskService.createTask(validData);
 	}
 
-	throw new Response("Unknown Intent", { status: 400 });
+	if (validData.intent === "delete") {
+		return await TaskService.deleteTask(validData.id);
+	}
+
+	throw new Response("Invalid Submission Logic", { status: 400 });
 }
 
 export default function Home() {

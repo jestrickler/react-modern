@@ -1,5 +1,5 @@
+import { CssBaseline, createTheme, ThemeProvider } from "@mui/material";
 import { Links, Meta, Outlet, Scripts, ScrollRestoration } from "react-router";
-import { ThemeProvider, createTheme, CssBaseline } from "@mui/material";
 
 // Create a dark theme instance
 const darkTheme = createTheme({

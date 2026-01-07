@@ -1,9 +1,9 @@
 import { render, screen } from "@testing-library/react";
-import { describe, it, expect, vi } from "vitest";
 import { createMemoryRouter, RouterProvider } from "react-router";
+import { describe, expect, it, vi } from "vitest";
 import { TaskService } from "../services/task.server";
 // Import HydrateFallback along with Home and loader
-import Home, { loader, HydrateFallback } from "./home";
+import Home, { HydrateFallback, loader } from "./home";
 
 vi.mock("../services/task.server", () => ({
 	TaskService: {

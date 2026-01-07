@@ -1,5 +1,5 @@
+import { Alert, AlertTitle, Box, Button } from "@mui/material";
 import { isRouteErrorResponse, useRouteError } from "react-router";
-import { Alert, AlertTitle, Button, Box } from "@mui/material";
 
 export function RouteErrorBoundary() {
 	const error = useRouteError();

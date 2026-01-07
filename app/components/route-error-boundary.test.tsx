@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
-import { describe, it, expect } from "vitest";
 import { createMemoryRouter, RouterProvider } from "react-router";
+import { describe, expect, it } from "vitest";
 import { RouteErrorBoundary } from "./route-error-boundary";
 
 describe("RouteErrorBoundary Component", () => {

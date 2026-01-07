@@ -1,6 +1,6 @@
-import { useFetcher } from "react-router";
+import { Box, Button, TextField } from "@mui/material";
 import { useEffect, useRef } from "react";
-import { TextField, Button, Box } from "@mui/material";
+import { useFetcher } from "react-router";
 
 export function TaskInputForm() {
 	const fetcher = useFetcher();

@@ -1,8 +1,21 @@
-// app/db.server.ts
 import { PrismaClient } from "@prisma/client";
 
-const globalForPrisma = global as unknown as { prisma: PrismaClient };
+let prisma: PrismaClient;
 
-export const db = globalForPrisma.prisma || new PrismaClient();
+declare global {
+	var __db__: PrismaClient | undefined;
+}
 
-if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = db;
+// This prevents the creation of a new connection on every file save during development.
+if (process.env.NODE_ENV === "production") {
+	prisma = new PrismaClient();
+} else {
+	if (!global.__db__) {
+		global.__db__ = new PrismaClient();
+	}
+	prisma = global.__db__;
+	// Explicitly connect to catch issues early in dev
+	prisma.$connect();
+}
+
+export { prisma };

@@ -1,7 +1,7 @@
-import { render, screen, fireEvent } from "@testing-library/react";
-import { describe, it, expect, vi } from "vitest";
-import { TaskInputForm } from "./task-input-form";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { createMemoryRouter, RouterProvider } from "react-router";
+import { describe, expect, it, vi } from "vitest";
+import { TaskInputForm } from "./task-input-form";
 
 const mockSubmit = vi.fn();
 
@@ -10,7 +10,10 @@ vi.mock("react-router", async () => {
 	return {
 		...actual,
 		useFetcher: () => ({
-			Form: ({ children, ...props }: any) => (
+			Form: ({
+				children,
+				...props
+			}: React.FormHTMLAttributes<HTMLFormElement>) => (
 				<form
 					{...props}
 					onSubmit={(e) => {
