@@ -1,5 +1,5 @@
 import { render, screen, waitFor } from "@testing-library/react";
-import { createBrowserRouter, RouterProvider } from "react-router";
+import { createBrowserRouter, data, RouterProvider } from "react-router";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import Home, { ErrorBoundary, loader } from "./home";
 
@@ -16,7 +16,7 @@ describe("Home Route Integration", () => {
 		vi.clearAllMocks();
 	});
 
-	const renderHome = (path = "/") => {
+	const renderHome = () => {
 		const router = createBrowserRouter([
 			{
 				path: "/",
@@ -30,10 +30,12 @@ describe("Home Route Integration", () => {
 	};
 
 	it("renders success state with tasks", async () => {
-		const mockTasks = [{ id: "1", title: "Test Task", completed: false }];
-		vi.mocked(homeLoader).mockResolvedValue({
-			tasks: Promise.resolve(mockTasks),
-		});
+		const mockTasks = [
+			{ id: "1", title: "Test Task", createdAt: new Date(), completed: false },
+		];
+		vi.mocked(homeLoader).mockResolvedValue(
+			data({ tasks: Promise.resolve(mockTasks) }),
+		);
 
 		renderHome();
 
@@ -48,9 +50,7 @@ describe("Home Route Integration", () => {
 		// Attach a catch handler to prevent unhandled rejection warning
 		rejectedPromise.catch(() => {});
 
-		vi.mocked(homeLoader).mockResolvedValue({
-			tasks: rejectedPromise,
-		});
+		vi.mocked(homeLoader).mockResolvedValue(data({ tasks: rejectedPromise }));
 
 		renderHome();
 
