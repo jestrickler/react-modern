@@ -8,7 +8,7 @@ import {
 	Typography,
 } from "@mui/material";
 import { useFetcher } from "react-router";
-import type { TaskResult } from "../models/task";
+import type { TaskResult } from "./task.schema";
 
 interface TaskListProps {
 	tasks: TaskResult[];

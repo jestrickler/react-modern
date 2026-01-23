@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { prisma } from "../db.server"; // Named export
-import { TaskService } from "./task.server";
+import { prisma } from "../shared/db.server"; // Named export
+import { TaskService } from "./task.service";
 
 describe("TaskService", () => {
 	beforeEach(async () => {

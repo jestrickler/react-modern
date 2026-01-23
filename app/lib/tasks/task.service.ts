@@ -1,5 +1,5 @@
-import { prisma } from "../db.server";
-import type { TaskInput, TaskResult } from "../models/task";
+import { prisma } from "../shared/db.server";
+import type { TaskInput, TaskResult } from "./task.schema";
 
 export const TaskService = {
 	async getAllTasks(): Promise<TaskResult[]> {

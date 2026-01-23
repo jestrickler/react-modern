@@ -1,56 +1,16 @@
-import { Box, CircularProgress, Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import { Suspense } from "react";
-import {
-	type ActionFunctionArgs,
-	Await,
-	data,
-	type LoaderFunctionArgs,
-	useLoaderData,
-} from "react-router";
-import { RouteErrorBoundary } from "../components/route-error-boundary";
-import { TaskInputForm } from "../components/task-input-form";
-import { TaskList } from "../components/task-list";
-import { TaskListSkeleton } from "../components/task-list-skeleton";
-import { TaskSchema } from "../models/task";
-import { TaskService } from "../services/task.server";
+import { Await, useLoaderData } from "react-router";
+import { ListSkeleton } from "../lib/shared/ui/list-skeleton";
+import { RouteErrorBoundary } from "../lib/shared/ui/route-error-boundary";
+import { TaskInputForm } from "../lib/tasks/task-input-form";
+import { TaskList } from "../lib/tasks/task-list";
+import { homeAction, homeLoader } from "./home.server";
 
+export const loader = homeLoader;
+export const action = homeAction;
 export const ErrorBoundary = RouteErrorBoundary;
-
-export function HydrateFallback() {
-	return (
-		<Box sx={{ display: "flex", justifyContent: "center", mt: 8 }}>
-			<CircularProgress />
-		</Box>
-	);
-}
-
-export async function loader(_args: LoaderFunctionArgs) {
-	const tasksPromise = TaskService.getAllTasks();
-	return data({ tasks: tasksPromise });
-}
-
-export async function action({ request }: ActionFunctionArgs) {
-	const formData = await request.formData();
-	const submission = TaskSchema.safeParse(Object.fromEntries(formData));
-
-	if (!submission.success) {
-		// In production, you'd log this to an error tracking service
-		return data({ errors: submission.error.flatten() }, { status: 400 });
-	}
-
-	const validData = submission.data;
-
-	// Branching logic based on validated intent
-	if (validData.intent === "create") {
-		return await TaskService.createTask(validData);
-	}
-
-	if (validData.intent === "delete") {
-		return await TaskService.deleteTask(validData.id);
-	}
-
-	throw new Response("Invalid Submission Logic", { status: 400 });
-}
+export { HydrateFallback } from "../lib/shared/ui/hydrate-fallback";
 
 export default function Home() {
 	const { tasks } = useLoaderData<typeof loader>();
@@ -69,7 +29,7 @@ export default function Home() {
 			<TaskInputForm />
 
 			<Box sx={{ my: 4 }}>
-				<Suspense fallback={<TaskListSkeleton />}>
+				<Suspense fallback={<ListSkeleton />}>
 					<Await resolve={tasks} errorElement={<p>Error loading tasks!</p>}>
 						{(resolvedTasks) => <TaskList tasks={resolvedTasks} />}
 					</Await>
